@@ -1,19 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Character : MonoBehaviour
 {
     private Rigidbody2D rbd;
     public LayerMask enemy;
     public LayerMask mask;
-    public GameObject foot;
     private Animator anim;
     public float VEL = 5;
     public float JUMP = 300;
     private bool lookingRight = true;
     private bool floor = true;
     private float x;
+    public GameObject feet;
+    public GameObject rightBody;
+    public GameObject leftBody;
 
     void Start()
     {
@@ -26,6 +29,7 @@ public class Character : MonoBehaviour
         move();
         jump();
         killEnemy();
+        die();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -62,7 +66,7 @@ public class Character : MonoBehaviour
 
     private void verifyFloor()
     {
-        RaycastHit2D hit = Physics2D.Raycast(foot.transform.position, -foot.transform.up, 0.1f, mask);
+        RaycastHit2D hit = Physics2D.Raycast(feet.transform.position, -feet.transform.up, 0.1f, mask);
 
         if (hit.collider != null)
         {
@@ -86,11 +90,23 @@ public class Character : MonoBehaviour
 
     private void killEnemy()
     {
-        RaycastHit2D hit = Physics2D.Raycast(foot.transform.position, -foot.transform.up, 0.1f, enemy);
+        RaycastHit2D hit = Physics2D.Raycast(feet.transform.position, -feet.transform.up, 0.2f, enemy);
 
         if (hit.collider != null)
         {
             Destroy(hit.collider.gameObject);
+        }
+    }
+
+    private void die()
+    {
+        RaycastHit2D hitE = Physics2D.Raycast(leftBody.transform.position, -leftBody.transform.right, 0.1f, enemy);
+        RaycastHit2D hitD = Physics2D.Raycast(rightBody.transform.position, -rightBody.transform.right, 0.1f, enemy);
+
+        if (hitE.collider != null || hitD.collider != null)
+        {
+            Destroy(transform.gameObject);
+            SceneManager.LoadScene("Menu");
         }
     }
 }
